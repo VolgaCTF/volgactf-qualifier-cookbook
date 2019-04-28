@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+RUN_USER=${TARGET_USER:-"<%= @run_user %>"}
+if [ "$(whoami)" != "$RUN_USER" ]; then
+  exec sudo -u "$RUN_USER" -- "$0" "$@"
+fi
+
+PGPASSWORD="<%= @pg_password %>" psql -h <%= @pg_host %> -p <%= @pg_port %> -U <%= @pg_username %> -d <%= @pg_dbname %> -c "DROP OWNED BY CURRENT_USER;"

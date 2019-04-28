@@ -1,0 +1,13 @@
+name 'volgactf-qualifier'
+maintainer 'Alexander Pyatkin'
+maintainer_email 'aspyatkin@gmail.com'
+license 'MIT'
+description 'Installs and configures VolgaCTF Qualifier platform'
+version '1.0.0'
+
+depends 'nodejs', '~> 6.0.0'
+depends 'ngx'
+depends 'agit', '~> 0.1.2'
+depends 'poise-python', '~> 1.7.0'
+depends 'tls', '~> 3.2.0'
+depends 'instance', '~> 2.0.1'

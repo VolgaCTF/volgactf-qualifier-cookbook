@@ -1,0 +1,41 @@
+REDIS_HOST=<%= @new_resource.redis_host %>
+REDIS_PORT=<%= @new_resource.redis_port %>
+REDIS_DB=<%= @new_resource.redis_db %>
+
+POSTGRES_HOST=<%= @new_resource.postgres_host %>
+POSTGRES_PORT=<%= @new_resource.postgres_port %>
+POSTGRES_DBNAME=<%= @new_resource.postgres_db %>
+POSTGRES_USERNAME=<%= @new_resource.postgres_user %>
+POSTGRES_PASSWORD=<%= @new_resource.postgres_password %>
+
+MAILGUN_API_KEY=<%= @new_resource.mailgun_api_key %>
+MAILGUN_DOMAIN=<%= @new_resource.mailgun_domain %>
+
+TWITTER_API_CONSUMER_KEY=<%= @new_resource.twitter_api_consumer_key %>
+TWITTER_API_CONSUMER_SECRET=<%= @new_resource.twitter_api_consumer_secret %>
+TWITTER_API_ACCESS_TOKEN=<%= @new_resource.twitter_api_access_token %>
+TWITTER_API_ACCESS_TOKEN_SECRET=<%= @new_resource.twitter_api_access_token_secret %>
+
+TELEGRAM_BOT_ACCESS_TOKEN=<%= @new_resource.telegram_bot_access_token %>
+TELEGRAM_CHAT_ID=<%= @new_resource.telegram_chat_id %>
+TELEGRAM_SOCKS5_HOST=<%= @new_resource.telegram_socks5_host %>
+TELEGRAM_SOCKS5_PORT=<%= @new_resource.telegram_socks5_port %>
+TELEGRAM_SOCKS5_USERNAME=<%= @new_resource.telegram_socks5_username %>
+TELEGRAM_SOCKS5_PASSWORD=<%= @new_resource.telegram_socks5_password %>
+
+THEMIS_QUALS_NUM_PROCESSES=<%= @new_resource.num_processes_queue %>
+THEMIS_QUALS_FQDN=<%= @new_resource.fqdn %>
+THEMIS_QUALS_SECURE=<%= @new_resource.secure ? 'yes' : 'no' %>
+THEMIS_QUALS_CUSTOMIZER_NAME=<%= @new_resource.customizer_name %>
+THEMIS_QUALS_CUSTOMIZER_HOST=<%= @new_resource.customizer_host %>
+THEMIS_QUALS_CUSTOMIZER_PORT=<%= @new_resource.customizer_port %>
+THEMIS_QUALS_TEAM_LOGOS_DIR=<%= @team_logos_basedir %>
+THEMIS_QUALS_STREAM_MAX_CONNECTIONS=<%= @new_resource.stream_max_connections %>
+THEMIS_QUALS_STREAM_REDIS_CHANNEL=<%= @new_resource.stream_redis_channel %>
+THEMIS_QUALS_EMAIL_TRANSPORT=<%= @new_resource.email_transport %>
+THEMIS_QUALS_EMAIL_SENDER_NAME=<%= @new_resource.email_sender_name %>
+THEMIS_QUALS_EMAIL_SENDER_ADDRESS=<%= @new_resource.email_sender_address %>
+THEMIS_QUALS_QUEUE_PREFIX=<%= @new_resource.queue_prefix %>
+THEMIS_QUALS_NOTIFICATION_POST_NEWS=<%= @new_resource.notification_post_news ? 'yes' : 'no' %>
+THEMIS_QUALS_NOTIFICATION_POST_TWITTER=<%= @new_resource.notification_post_twitter ? 'yes' : 'no' %>
+THEMIS_QUALS_NOTIFICATION_POST_TELEGRAM=<%= @new_resource.notification_post_telegram ? 'yes' : 'no' %>

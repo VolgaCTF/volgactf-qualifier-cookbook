@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+HOME="<%= @dist_cache_dir %>" <%= @env.map { |k, v| "#{k}=\"#{v}\""}.join(' ') %> node <%= @dist_dir %>/src/bin/cli.js "$@"
+RET_CODE=$?
+exit $RET_CODE

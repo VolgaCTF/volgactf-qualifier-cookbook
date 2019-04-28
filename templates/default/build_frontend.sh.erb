@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+CUR_DIR=$PWD
+cd <%= @src_dir %>
+<%= @env.map { |k, v| "#{k}=\"#{v}\""}.join(' ') %> npm run build
+sudo rm -rf <%= @dist_dir %>/* && sudo rsync --verbose --recursive --owner --group --chown=<%= @dist_user %>:<%= @dist_group %> <%= @build_dir %>/ <%= @dist_dir %>/
+RET_VAL=$?
+cd $CUR_DIR
+exit $RET_VAL

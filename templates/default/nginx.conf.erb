@@ -1,0 +1,209 @@
+upstream volgactf_qualifier_backend {
+  server <%= @backend_host %>:<%= @backend_port %>;
+}
+
+<% if @secure && !@proxied %>
+server {
+  server_name <%= @fqdn %>;
+  listen 80;
+
+  location / {
+    return 301 https://<%= @fqdn %>$request_uri;
+  }
+}
+<% end %>
+
+server {
+  server_name <%= @fqdn %>;
+  <% if @secure && !@proxied %>
+  listen 443 ssl http2;
+
+  <% @certificate_entries.each do |item| %>
+  ssl_certificate <%= item.certificate_path %>; # CRC32: <%= item.certificate_checksum %>
+  ssl_certificate_key <%= item.certificate_private_key_path %>; # CRC32: <%= item.certificate_private_key_checksum %>
+  <% end %>
+
+  <% if @oscp_stapling %>
+  ssl_stapling on;
+  ssl_stapling_verify on;
+  resolver <%= @resolvers.join(' ') %> valid=<%= @resolver_valid %>s;
+  resolver_timeout <%= @resolver_timeout %>s;
+  <% end %>
+
+  <% else %>
+  listen 80;
+  <% end %>
+
+  client_max_body_size <%= @post_max_data_size %>m;
+
+  location /assets/css {
+    alias <%= @dist_frontend_dir %>/assets/css;
+    expires 1d;
+    access_log off;
+    add_header Cache-Control public;
+    <% if @secure && !@proxied %>
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
+    <% end %>
+    <% if @optimize %>
+    gzip_static on;
+    brotli_static on;
+    <% end %>
+  }
+
+  location /assets/js {
+    alias <%= @dist_frontend_dir %>/assets/js;
+    expires 1d;
+    access_log off;
+    add_header Cache-Control public;
+    <% if @secure %>
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
+    <% end %>
+    <% if @optimize %>
+    gzip_static on;
+    brotli_static on;
+    <% end %>
+  }
+
+  location /assets/fonts {
+    alias <%= @dist_frontend_dir %>/assets/fonts;
+    expires 1d;
+    access_log off;
+    add_header Cache-Control public;
+    add_header Access-Control-Allow-Origin <%= @fqdn %>;
+    <% if @secure && !@proxied %>
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
+    <% end %>
+    <% if @optimize %>
+    gzip_static on;
+    brotli_static on;
+    <% end %>
+  }
+
+  location /assets/images {
+    alias <%= @dist_frontend_dir %>/assets/images;
+    expires 1d;
+    access_log off;
+    add_header Cache-Control public;
+    <% if @secure && !@proxied %>
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
+    <% end %>
+  }
+
+  location /files {
+    alias <%= @task_files_basedir %>;
+    expires 1d;
+    add_header Cache-Control public;
+    <% if @secure && !@proxied %>
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
+    <% end %>
+  }
+
+  location /team/logo {
+    alias <%= @team_logos_basedir %>;
+    try_files $uri /team/logo/default.png;
+    etag on;
+    add_header Cache-Control must-revalidate;
+    <% if @secure && !@proxied %>
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
+    <% end %>
+  }
+
+  location /api/stream {
+    proxy_set_header Connection '';
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto <%= @secure ? 'https' : 'http' %>;
+
+    proxy_pass http://volgactf_qualifier_backend/api/stream;
+    proxy_redirect off;
+
+    proxy_http_version 1.1;
+    chunked_transfer_encoding off;
+    proxy_buffering off;
+    proxy_cache off;
+    proxy_read_timeout 30m;
+
+    <% if @secure && !@proxied %>
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
+    <% end %>
+  }
+
+  location /api/team/signup {
+    client_max_body_size <%= @post_max_team_logo_size %>m;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto <%= @secure ? 'https' : 'http' %>;
+
+    proxy_set_header X-GeoIP-Country-Code $geoip2_data_country_code;
+    proxy_set_header X-GeoIP-Country-Name $geoip2_data_country_name;
+    proxy_set_header X-GeoIP-City-Name $geoip2_data_city_name;
+
+    proxy_pass http://volgactf_qualifier_backend/api/team/signup;
+    proxy_redirect off;
+
+    proxy_http_version 1.1;
+
+    <% if @secure && !@proxied %>
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
+    <% end %>
+  }
+
+  location ~ ^/api/task/(\d+)/file/create$ {
+    client_max_body_size <%= @post_max_task_file_size %>m;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto <%= @secure ? 'https' : 'http' %>;
+
+    proxy_set_header X-GeoIP-Country-Code $geoip2_data_country_code;
+    proxy_set_header X-GeoIP-Country-Name $geoip2_data_country_name;
+    proxy_set_header X-GeoIP-City-Name $geoip2_data_city_name;
+
+    proxy_pass http://volgactf_qualifier_backend$request_uri;
+    proxy_redirect off;
+
+    proxy_http_version 1.1;
+
+    <% if @secure && !@proxied %>
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
+    <% end %>
+  }
+
+  location / {
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto <%= @secure ? 'https' : 'http' %>;
+
+    proxy_set_header X-GeoIP-Country-Code $geoip2_data_country_code;
+    proxy_set_header X-GeoIP-Country-Name $geoip2_data_country_name;
+    proxy_set_header X-GeoIP-City-Name $geoip2_data_city_name;
+
+    proxy_pass http://volgactf_qualifier_backend/;
+    proxy_redirect off;
+
+    proxy_http_version 1.1;
+
+    <% if @secure && !@proxied %>
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
+    <% end %>
+    <% if @optimize %>
+    brotli on;
+    brotli_types application/json;
+    <% end %>
+  }
+
+  keepalive_timeout 300;
+  charset utf-8;
+
+  <% if @access_log_options == 'off' %>
+  access_log off;
+  <% else %>
+  access_log <%= @access_log %><% unless @access_log_options.empty? %> <%= @access_log_options %><% end %>;
+  <% end %>
+  error_log <%= @error_log %><% unless @error_log_options.empty? %> <%= @error_log_options %><% end %>;
+
+  server_tokens off;
+}

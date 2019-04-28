@@ -1,0 +1,8 @@
+geoip2 <%= @country_database %> {
+  $geoip2_data_country_code default=- source=$remote_addr country iso_code;
+  $geoip2_data_country_name default=- source=$remote_addr country names en;
+}
+
+geoip2 <%= @city_database %> {
+  $geoip2_data_city_name default=- source=$remote_addr city names en;
+}
