@@ -8,9 +8,6 @@ POSTGRES_DBNAME=<%= @new_resource.postgres_db %>
 POSTGRES_USERNAME=<%= @new_resource.postgres_user %>
 POSTGRES_PASSWORD=<%= @new_resource.postgres_password %>
 
-MAILGUN_API_KEY=<%= @new_resource.mailgun_api_key %>
-MAILGUN_DOMAIN=<%= @new_resource.mailgun_domain %>
-
 TWITTER_API_CONSUMER_KEY=<%= @new_resource.twitter_api_consumer_key %>
 TWITTER_API_CONSUMER_SECRET=<%= @new_resource.twitter_api_consumer_secret %>
 TWITTER_API_ACCESS_TOKEN=<%= @new_resource.twitter_api_access_token %>
@@ -32,10 +29,20 @@ THEMIS_QUALS_CUSTOMIZER_PORT=<%= @new_resource.customizer_port %>
 THEMIS_QUALS_TEAM_LOGOS_DIR=<%= @team_logos_basedir %>
 THEMIS_QUALS_STREAM_MAX_CONNECTIONS=<%= @new_resource.stream_max_connections %>
 THEMIS_QUALS_STREAM_REDIS_CHANNEL=<%= @new_resource.stream_redis_channel %>
-THEMIS_QUALS_EMAIL_TRANSPORT=<%= @new_resource.email_transport %>
-THEMIS_QUALS_EMAIL_SENDER_NAME=<%= @new_resource.email_sender_name %>
-THEMIS_QUALS_EMAIL_SENDER_ADDRESS=<%= @new_resource.email_sender_address %>
 THEMIS_QUALS_QUEUE_PREFIX=<%= @new_resource.queue_prefix %>
 THEMIS_QUALS_NOTIFICATION_POST_NEWS=<%= @new_resource.notification_post_news ? 'yes' : 'no' %>
 THEMIS_QUALS_NOTIFICATION_POST_TWITTER=<%= @new_resource.notification_post_twitter ? 'yes' : 'no' %>
 THEMIS_QUALS_NOTIFICATION_POST_TELEGRAM=<%= @new_resource.notification_post_telegram ? 'yes' : 'no' %>
+
+VOLGACTF_QUALIFIER_EMAIL_TRANSPORT=<%= @new_resource.email_transport %>
+VOLGACTF_QUALIFIER_EMAIL_SENDER_NAME=<%= @new_resource.email_sender_name %>
+VOLGACTF_QUALIFIER_EMAIL_SENDER_ADDRESS=<%= @new_resource.email_sender_address %>
+
+MAILGUN_API_KEY=<%= @new_resource.mailgun_api_key %>
+MAILGUN_DOMAIN=<%= @new_resource.mailgun_domain %>
+
+SMTP_HOST=<%= @new_resource.smtp_host %>
+SMTP_PORT=<%= @new_resource.smtp_port %>
+SMTP_SECURE=<%= @new_resource.smtp_secure ? 'yes' : 'no' %>
+SMTP_USERNAME=<%= @new_resource.smtp_username %>
+SMTP_PASSWORD=<%= @new_resource.smtp_password %>

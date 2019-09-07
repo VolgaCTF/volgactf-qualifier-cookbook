@@ -40,8 +40,14 @@ property :redis_db, Integer, required: true
 
 property :google_tag_id, [NilClass, String], default: nil
 
-property :mailgun_api_key, String, required: true
-property :mailgun_domain, String, required: true
+property :mailgun_api_key, [NilClass, String], required: true
+property :mailgun_domain, [NilClass, String], required: true
+
+property :smtp_host, [NilClass, String], required: true
+property :smtp_port, [NilClass, Integer], required: true
+property :smtp_secure, [TrueClass, FalseClass], required: true
+property :smtp_username, [NilClass, String], required: true
+property :smtp_password, [NilClass, String], required: true
 
 property :twitter_api_consumer_key, [NilClass, String], default: nil
 property :twitter_api_consumer_secret, [NilClass, String], default: nil
@@ -66,7 +72,7 @@ property :stream_redis_channel, String, default: 'volgactf_qualifier_realtime'
 property :queue_prefix, String, default: 'volgactf-qualifier'
 
 property :email_transport, [NilClass, String], default: nil
-property :email_enforce_address_validation, [TrueClass, FalseClass], default: false
+property :email_address_validator, [NilClass, String], default: nil
 property :email_sender_name, String, required: true
 property :email_sender_address, String, required: true
 
@@ -810,30 +816,28 @@ action :install do
     action :create
   end
 
-  if new_resource.development
-    dbreset_script = ::File.join(new_resource.root_dir, 'script', 'dbreset')
+  dbreset_script = ::File.join(new_resource.root_dir, 'script', 'dbreset')
 
-    template dbreset_script do
-      cookbook 'volgactf-qualifier'
-      source 'dbreset.sh.erb'
-      owner instance.user
-      group instance.group
-      variables(
-        run_user: new_resource.user,
-        pg_host: new_resource.postgres_host,
-        pg_port: new_resource.postgres_port,
-        pg_dbname: new_resource.postgres_db,
-        pg_username: new_resource.postgres_user,
-        pg_password: new_resource.postgres_password
-      )
-      mode 0755
-      action :create
-    end
+  template dbreset_script do
+    cookbook 'volgactf-qualifier'
+    source 'dbreset.sh.erb'
+    owner instance.user
+    group instance.group
+    variables(
+      run_user: new_resource.user,
+      pg_host: new_resource.postgres_host,
+      pg_port: new_resource.postgres_port,
+      pg_dbname: new_resource.postgres_db,
+      pg_username: new_resource.postgres_user,
+      pg_password: new_resource.postgres_password
+    )
+    mode 0755
+    action :create
   end
 
   if new_resource.backup_enabled
-    python_package 'awscli' do
-      action :install
+    execute 'pip install awscli' do
+      action :run
     end
 
     backup_script = ::File.join(new_resource.root_dir, 'script', 'backup')
