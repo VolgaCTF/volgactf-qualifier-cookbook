@@ -400,9 +400,9 @@ action :install do
       dist_group: new_resource.group,
       env: {
         'OPTIMIZE' => new_resource.optimize_delivery ? 'yes' : 'no',
-        'THEMIS_QUALS_CUSTOMIZER_NAME' => new_resource.customizer_name,
-        'THEMIS_QUALS_CUSTOMIZER_HOST' => new_resource.customizer_host,
-        'THEMIS_QUALS_CUSTOMIZER_PORT' => new_resource.customizer_port.to_s
+        'VOLGACTF_QUALIFIER_CUSTOMIZER_NAME' => new_resource.customizer_name,
+        'VOLGACTF_QUALIFIER_CUSTOMIZER_HOST' => new_resource.customizer_host,
+        'VOLGACTF_QUALIFIER_CUSTOMIZER_PORT' => new_resource.customizer_port.to_s
       }
     )
     mode 0755
@@ -797,14 +797,14 @@ action :install do
       dist_dir: dist_backend_dir,
       dist_cache_dir: dist_cache_dir,
       env: {
-        'THEMIS_QUALS_SESSION_SECRET' => new_resource.session_secret,
-        'THEMIS_QUALS_FQDN' => new_resource.fqdn,
+        'VOLGACTF_QUALIFIER_SESSION_SECRET' => new_resource.session_secret,
+        'VOLGACTF_QUALIFIER_FQDN' => new_resource.fqdn,
         'REDIS_HOST' => new_resource.redis_host,
         'REDIS_PORT' => new_resource.redis_port,
         'REDIS_DB' => new_resource.redis_db,
-        'THEMIS_QUALS_TEAM_LOGOS_DIR' => team_logos_basedir,
-        'THEMIS_QUALS_QUEUE_PREFIX' => new_resource.queue_prefix,
-        'THEMIS_QUALS_STREAM_REDIS_CHANNEL' => new_resource.stream_redis_channel,
+        'VOLGACTF_QUALIFIER_TEAM_LOGOS_DIR' => team_logos_basedir,
+        'VOLGACTF_QUALIFIER_QUEUE_PREFIX' => new_resource.queue_prefix,
+        'VOLGACTF_QUALIFIER_STREAM_REDIS_CHANNEL' => new_resource.stream_redis_channel,
         'POSTGRES_HOST' => new_resource.postgres_host,
         'POSTGRES_PORT' => new_resource.postgres_port,
         'POSTGRES_DBNAME' => new_resource.postgres_db,

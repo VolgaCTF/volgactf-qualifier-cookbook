@@ -10,24 +10,24 @@ POSTGRES_PASSWORD=<%= @new_resource.postgres_password %>
 
 GOOGLE_TAG_ID=<%= @new_resource.google_tag_id %>
 
-THEMIS_QUALS_NUM_PROCESSES=<%= @new_resource.num_processes_server %>
-THEMIS_QUALS_SESSION_SECRET=<%= @new_resource.session_secret %>
-THEMIS_QUALS_FQDN=<%= @new_resource.fqdn %>
-THEMIS_QUALS_SECURE=<%= @new_resource.secure ? 'yes' : 'no' %>
-THEMIS_QUALS_HOST=<%= @new_resource.backend_host %>
-THEMIS_QUALS_PORT=<%= @new_resource.backend_port %>
-THEMIS_QUALS_TEAM_LOGOS_DIR=<%= @team_logos_basedir %>
-THEMIS_QUALS_DIST_FRONTEND_DIR=<%= @dist_frontend_dir %>
-THEMIS_QUALS_STREAM_MAX_CONNECTIONS=<%= @new_resource.stream_max_connections %>
-THEMIS_QUALS_STREAM_REDIS_CHANNEL=<%= @new_resource.stream_redis_channel %>
-THEMIS_QUALS_QUEUE_PREFIX=<%= @new_resource.queue_prefix %>
-THEMIS_QUALS_CUSTOMIZER_NAME=<%= @new_resource.customizer_name %>
-THEMIS_QUALS_CUSTOMIZER_HOST=<%= @new_resource.customizer_host %>
-THEMIS_QUALS_CUSTOMIZER_PORT=<%= @new_resource.customizer_port %>
-THEMIS_QUALS_POST_MAX_TEAM_LOGO_SIZE=<%= @new_resource.post_max_team_logo_size %>
-THEMIS_QUALS_POST_MAX_TASK_FILE_SIZE=<%= @new_resource.post_max_task_file_size %>
-THEMIS_QUALS_TASK_FILES_DIR=<%= @task_files_basedir %>
-THEMIS_QUALS_UPLOAD_TMP_DIR=<%= @upload_tmp_basedir %>
+VOLGACTF_QUALIFIER_NUM_PROCESSES=<%= @new_resource.num_processes_server %>
+VOLGACTF_QUALIFIER_SESSION_SECRET=<%= @new_resource.session_secret %>
+VOLGACTF_QUALIFIER_FQDN=<%= @new_resource.fqdn %>
+VOLGACTF_QUALIFIER_SECURE=<%= @new_resource.secure ? 'yes' : 'no' %>
+VOLGACTF_QUALIFIER_HOST=<%= @new_resource.backend_host %>
+VOLGACTF_QUALIFIER_PORT=<%= @new_resource.backend_port %>
+VOLGACTF_QUALIFIER_TEAM_LOGOS_DIR=<%= @team_logos_basedir %>
+VOLGACTF_QUALIFIER_DIST_FRONTEND_DIR=<%= @dist_frontend_dir %>
+VOLGACTF_QUALIFIER_STREAM_MAX_CONNECTIONS=<%= @new_resource.stream_max_connections %>
+VOLGACTF_QUALIFIER_STREAM_REDIS_CHANNEL=<%= @new_resource.stream_redis_channel %>
+VOLGACTF_QUALIFIER_QUEUE_PREFIX=<%= @new_resource.queue_prefix %>
+VOLGACTF_QUALIFIER_CUSTOMIZER_NAME=<%= @new_resource.customizer_name %>
+VOLGACTF_QUALIFIER_CUSTOMIZER_HOST=<%= @new_resource.customizer_host %>
+VOLGACTF_QUALIFIER_CUSTOMIZER_PORT=<%= @new_resource.customizer_port %>
+VOLGACTF_QUALIFIER_POST_MAX_TEAM_LOGO_SIZE=<%= @new_resource.post_max_team_logo_size %>
+VOLGACTF_QUALIFIER_POST_MAX_TASK_FILE_SIZE=<%= @new_resource.post_max_task_file_size %>
+VOLGACTF_QUALIFIER_TASK_FILES_DIR=<%= @task_files_basedir %>
+VOLGACTF_QUALIFIER_UPLOAD_TMP_DIR=<%= @upload_tmp_basedir %>
 
 VOLGACTF_QUALIFIER_EMAIL_TRANSPORT=<%= @new_resource.email_transport %>
 VOLGACTF_QUALIFIER_EMAIL_ADDRESS_VALIDATOR=<%= @new_resource.email_address_validator || 'none' %>
