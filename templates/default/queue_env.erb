@@ -46,3 +46,4 @@ SMTP_PORT=<%= @new_resource.smtp_port %>
 SMTP_SECURE=<%= @new_resource.smtp_secure ? 'yes' : 'no' %>
 SMTP_USERNAME=<%= @new_resource.smtp_username %>
 SMTP_PASSWORD=<%= @new_resource.smtp_password %>
+SMTP_HEADERS_JSON=<%= @new_resource.smtp_headers.to_json %>

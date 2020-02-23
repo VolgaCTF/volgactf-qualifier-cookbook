@@ -3,7 +3,7 @@ maintainer 'Alexander Pyatkin'
 maintainer_email 'aspyatkin@gmail.com'
 license 'MIT'
 description 'Installs and configures VolgaCTF Qualifier platform'
-version '2.0.0'
+version '2.0.1'
 
 depends 'nodejs', '~> 6.0.0'
 depends 'ngx'
