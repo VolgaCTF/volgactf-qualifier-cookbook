@@ -40,18 +40,18 @@ property :redis_db, Integer, required: true
 
 property :google_tag_id, [NilClass, String], default: nil
 
-property :mailgun_api_key, [NilClass, String], required: true
-property :mailgun_domain, [NilClass, String], required: true
+property :mailgun_api_key, [NilClass, String], default: nil
+property :mailgun_domain, [NilClass, String], default: nil
 
-property :zerobounce_api_key, [NilClass, String], required: true
-property :mailboxlayer_api_key, [NilClass, String], required: true
-property :thechecker_api_key, [NilClass, String], required: true
+property :zerobounce_api_key, [NilClass, String], default: nil
+property :mailboxlayer_api_key, [NilClass, String], default: nil
+property :thechecker_api_key, [NilClass, String], default: nil
 
-property :smtp_host, [NilClass, String], required: true
-property :smtp_port, [NilClass, Integer], required: true
-property :smtp_secure, [TrueClass, FalseClass], required: true
-property :smtp_username, [NilClass, String], required: true
-property :smtp_password, [NilClass, String], required: true
+property :smtp_host, [NilClass, String], default: nil
+property :smtp_port, [NilClass, Integer], default: nil
+property :smtp_secure, [TrueClass, FalseClass], default: true
+property :smtp_username, [NilClass, String], default: nil
+property :smtp_password, [NilClass, String], default: nil
 property :smtp_headers, Hash, default: {}
 
 property :twitter_api_consumer_key, [NilClass, String], default: nil
