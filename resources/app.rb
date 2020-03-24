@@ -78,6 +78,7 @@ property :queue_prefix, String, default: 'volgactf-qualifier'
 
 property :email_transport, [NilClass, String], default: nil
 property :email_address_validator, [NilClass, String], default: nil
+property :email_address_validator_ignore_list, Array, default: []
 property :email_sender_name, String, required: true
 property :email_sender_address, String, required: true
 

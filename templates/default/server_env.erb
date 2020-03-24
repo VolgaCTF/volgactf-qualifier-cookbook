@@ -31,6 +31,7 @@ VOLGACTF_QUALIFIER_UPLOAD_TMP_DIR=<%= @upload_tmp_basedir %>
 
 VOLGACTF_QUALIFIER_EMAIL_TRANSPORT=<%= @new_resource.email_transport %>
 VOLGACTF_QUALIFIER_EMAIL_ADDRESS_VALIDATOR=<%= @new_resource.email_address_validator || 'none' %>
+VOLGACTF_QUALIFIER_EMAIL_ADDRESS_VALIDATOR_IGNORE_LIST=<%= @new_resource.email_address_validator_ignore_list.join(',') %>
 
 MAILGUN_API_KEY=<%= @new_resource.mailgun_api_key %>
 MAILGUN_DOMAIN=<%= @new_resource.mailgun_domain %>
