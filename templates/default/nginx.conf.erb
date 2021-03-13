@@ -23,7 +23,7 @@ server {
   ssl_certificate_key <%= item.certificate_private_key_path %>; # CRC32: <%= item.certificate_private_key_checksum %>
   <% end %>
 
-  <% if @oscp_stapling %>
+  <% if @ocsp_stapling %>
   ssl_stapling on;
   ssl_stapling_verify on;
   resolver <%= @resolvers.join(' ') %> valid=<%= @resolver_valid %>s;

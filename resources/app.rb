@@ -1,3 +1,5 @@
+require 'securerandom'
+
 resource_name :volgactf_qualifier_app
 property :fqdn, String, name_property: true
 
@@ -5,6 +7,10 @@ property :user, String, default: 'volgactf_qualifier'
 property :group, String, default: 'volgactf_qualifier'
 property :uid, Integer, default: 600
 property :gid, Integer, default: 600
+
+property :instance_user, String, required: true
+property :instance_user_home, String, required: true
+property :instance_group, String, required: true
 
 property :development, [TrueClass, FalseClass], default: false
 property :ssh_wrapper, [NilClass, String], default: nil
@@ -40,13 +46,6 @@ property :redis_db, Integer, required: true
 
 property :google_tag_id, [NilClass, String], default: nil
 
-property :mailgun_api_key, [NilClass, String], default: nil
-property :mailgun_domain, [NilClass, String], default: nil
-
-property :zerobounce_api_key, [NilClass, String], default: nil
-property :mailboxlayer_api_key, [NilClass, String], default: nil
-property :thechecker_api_key, [NilClass, String], default: nil
-
 property :smtp_host, [NilClass, String], default: nil
 property :smtp_port, [NilClass, Integer], default: nil
 property :smtp_secure, [TrueClass, FalseClass], default: true
@@ -66,8 +65,6 @@ property :telegram_socks5_port, [NilClass, Integer], default: nil
 property :telegram_socks5_username, [NilClass, String], default: nil
 property :telegram_socks5_password, [NilClass, String], default: nil
 
-property :session_secret, String, required: true
-
 property :backend_host, String, default: '127.0.0.1'
 property :backend_port, Integer, default: 8000
 
@@ -77,6 +74,7 @@ property :stream_redis_channel, String, default: 'volgactf_qualifier_realtime'
 property :queue_prefix, String, default: 'volgactf-qualifier'
 
 property :email_transport, [NilClass, String], default: nil
+property :email_webhook, [NilClass, String], default: nil
 property :email_address_validator, [NilClass, String], default: nil
 property :email_address_validator_ignore_list, Array, default: []
 property :email_sender_name, String, required: true
@@ -107,6 +105,10 @@ property :cleanup_upload_dir_cron_month, String, default: '*'
 property :cleanup_upload_dir_cron_weekday, String, default: '*'
 
 property :backup_enabled, [TrueClass, FalseClass], default: false
+property :backup_aws_access_key_id, [NilClass, String], default: nil
+property :backup_aws_secret_access_key, [NilClass, String], default: nil
+property :backup_aws_default_region, [NilClass, String], default: nil
+property :backup_aws_s3_bucket, [NilClass, String], default: nil
 property :backup_cron_mailto, [NilClass, String], default: nil
 property :backup_cron_mailfrom, [NilClass, String], default: nil
 property :backup_cron_minute, String, default: '*'
@@ -115,18 +117,13 @@ property :backup_cron_day, String, default: '*'
 property :backup_cron_month, String, default: '*'
 property :backup_cron_weekday, String, default: '*'
 
-property :aws_access_key_id, [NilClass, String], default: nil
-property :aws_secret_access_key, [NilClass, String], default: nil
-property :aws_default_region, [NilClass, String], default: nil
-property :aws_s3_bucket, [NilClass, String], default: nil
-
 property :geoip2_city_database, String, required: true
 property :geoip2_country_database, String, required: true
 
 property :secure, [TrueClass, FalseClass], required: true
 property :proxied, [TrueClass, FalseClass], required: true
 property :hsts_max_age, Integer, default: 15_768_000
-property :oscp_stapling, [TrueClass, FalseClass], default: true
+property :ocsp_stapling, [TrueClass, FalseClass], default: true
 property :resolvers, Array, default: %w(8.8.8.8 1.1.1.1 8.8.4.4 1.0.0.1)
 property :resolver_valid, Integer, default: 600
 property :resolver_timeout, Integer, default: 10
@@ -136,6 +133,17 @@ property :error_log_options, String, default: 'error'
 property :service_group_name, String, default: 'volgactf_qualifier'
 property :optimize_delivery, [TrueClass, FalseClass], default: false
 
+property :vlt_provider, Proc, default: lambda { nil }
+property :vlt_format, Integer, default: 2
+
+property :ctftime_oauth_client_id, [String, NilClass], default: nil
+property :ctftime_oauth_client_secret, [String, NilClass], default: nil
+
+property :ctftime_oauth_scope, String, default: 'profile:read team:read'
+property :ctftime_oauth_authorization_server_endpoint, String, default: 'https://oauth.ctftime.org/authorize'
+property :ctftime_oauth_access_token_endpoint, String, default: 'https://oauth.ctftime.org/token'
+property :ctftime_oauth_api_endpoint, String, default: 'https://oauth.ctftime.org/user'
+
 default_action :install
 
 action :install do
@@ -143,6 +151,7 @@ action :install do
     group new_resource.group
     uid new_resource.uid
     gid new_resource.gid
+    instance_user new_resource.instance_user
     action :create
   end
 
@@ -184,19 +193,17 @@ action :install do
     end
   end
 
-  instance = ::ChefCookbook::Instance::Helper.new(node)
-
   directory new_resource.root_dir do
-    owner instance.user
-    group instance.group
+    owner new_resource.instance_user
+    group new_resource.instance_group
     recursive true
     mode 0755
     action :create
   end
 
   directory ::File.join(new_resource.root_dir, 'src') do
-    owner instance.user
-    group instance.group
+    owner new_resource.instance_user
+    group new_resource.instance_group
     mode 0755
     action :create
   end
@@ -217,8 +224,8 @@ action :install do
   end
 
   directory ::File.join(new_resource.root_dir, 'script') do
-    owner instance.user
-    group instance.group
+    owner new_resource.instance_user
+    group new_resource.instance_group
     mode 0755
     action :create
   end
@@ -250,8 +257,8 @@ action :install do
   end
 
   directory src_customizer_dir do
-    owner instance.user
-    group instance.group
+    owner new_resource.instance_user
+    group new_resource.instance_group
     recursive true
     mode 0755
     action :create
@@ -263,16 +270,16 @@ action :install do
     agit customizer_dir do
       repository entry[:repo_url]
       branch entry[:repo_revision]
-      user instance.user
-      group instance.group
+      user new_resource.instance_user
+      group new_resource.instance_group
       action :update
     end
 
     npm_package "Install dependencies at #{customizer_dir}" do
       path customizer_dir
       json true
-      user instance.user
-      group instance.group
+      user new_resource.instance_user
+      group new_resource.instance_group
     end
   end
 
@@ -283,7 +290,7 @@ action :install do
   conf_dir = ::File.join(new_resource.root_dir, 'conf')
 
   directory conf_dir do
-    owner instance.root
+    owner 'root'
     group node['root_group']
     recursive true
     mode 0700
@@ -305,8 +312,8 @@ action :install do
     template ::File.join(new_resource.root_dir, 'script', 'build_customizer') do
       cookbook 'volgactf-qualifier'
       source 'build_customizer.sh.erb'
-      owner instance.user
-      group instance.group
+      owner new_resource.instance_user
+      group new_resource.instance_group
       variables(
         src_dir: src_specific_customizer_dir,
         dist_dir: dist_customizer_dir,
@@ -320,8 +327,8 @@ action :install do
 
     execute ::File.join(new_resource.root_dir, 'script', 'build_customizer') do
       cwd src_specific_customizer_dir
-      user instance.user
-      group instance.group
+      user new_resource.instance_user
+      group new_resource.instance_group
       action :run
     end
 
@@ -336,7 +343,7 @@ action :install do
     template customizer_env_file_path do
       cookbook 'volgactf-qualifier'
       source 'customizer_env.erb'
-      owner instance.root
+      owner 'root'
       group node['root_group']
       variables(
         new_resource: new_resource
@@ -372,16 +379,16 @@ action :install do
   agit src_frontend_dir do
     repository frontend_repo_url
     branch new_resource.frontend_repo_revision
-    user instance.user
-    group instance.group
+    user new_resource.instance_user
+    group new_resource.instance_group
     action :update
   end
 
   npm_package 'Install frontend dependencies' do
     path src_frontend_dir
     json true
-    user instance.user
-    group instance.group
+    user new_resource.instance_user
+    group new_resource.instance_group
   end
 
   dist_frontend_dir = ::File.join(new_resource.root_dir, 'dist', 'frontend')
@@ -396,8 +403,8 @@ action :install do
   template ::File.join(new_resource.root_dir, 'script', 'build_frontend') do
     cookbook 'volgactf-qualifier'
     source 'build_frontend.sh.erb'
-    owner instance.user
-    group instance.group
+    owner new_resource.instance_user
+    group new_resource.instance_group
     variables(
       src_dir: src_frontend_dir,
       build_dir: ::File.join(src_frontend_dir, 'build'),
@@ -417,24 +424,24 @@ action :install do
 
   execute ::File.join(new_resource.root_dir, 'script', 'build_frontend') do
     cwd src_frontend_dir
-    user instance.user
-    group instance.group
+    user new_resource.instance_user
+    group new_resource.instance_group
     action :run
   end
 
   agit database_dir do
     repository database_repo_url
     branch new_resource.database_repo_revision
-    user instance.user
-    group instance.group
+    user new_resource.instance_user
+    group new_resource.instance_group
     action :update
   end
 
   npm_package 'Install database dependencies' do
     path database_dir
     json true
-    user instance.user
-    group instance.group
+    user new_resource.instance_user
+    group new_resource.instance_group
   end
 
   knexfile_conf = ::File.join(database_dir, 'knexfile.js')
@@ -442,8 +449,8 @@ action :install do
   template knexfile_conf do
     cookbook 'volgactf-qualifier'
     source 'knexfile.js.erb'
-    owner instance.user
-    group instance.group
+    owner new_resource.instance_user
+    group new_resource.instance_group
     mode 0644
     variables(
       host: new_resource.postgres_host,
@@ -458,11 +465,11 @@ action :install do
   execute 'Migrate database' do
     command 'npm run knex -- migrate:latest'
     cwd database_dir
-    user instance.user
-    group instance.group
+    user new_resource.instance_user
+    group new_resource.instance_group
     environment(
-      'HOME' => instance.user_home,
-      'USER' => instance.user
+      'HOME' => new_resource.instance_user_home,
+      'USER' => new_resource.instance_user
     )
     action :run
   end
@@ -470,16 +477,16 @@ action :install do
   agit src_backend_dir do
     repository backend_repo_url
     branch new_resource.backend_repo_revision
-    user instance.user
-    group instance.group
+    user new_resource.instance_user
+    group new_resource.instance_group
     action :update
   end
 
   npm_package 'Install backend dependencies' do
     path src_backend_dir
     json true
-    user instance.user
-    group instance.group
+    user new_resource.instance_user
+    group new_resource.instance_group
   end
 
   dist_backend_dir = ::File.join(new_resource.root_dir, 'dist', 'backend')
@@ -494,8 +501,8 @@ action :install do
   template ::File.join(new_resource.root_dir, 'script', 'build_backend') do
     cookbook 'volgactf-qualifier'
     source 'build_backend.sh.erb'
-    owner instance.user
-    group instance.group
+    owner new_resource.instance_user
+    group new_resource.instance_group
     variables(
       src_dir: src_backend_dir,
       dist_dir: dist_backend_dir,
@@ -509,8 +516,8 @@ action :install do
 
   execute ::File.join(new_resource.root_dir, 'script', 'build_backend') do
     cwd src_backend_dir
-    user instance.user
-    group instance.group
+    user new_resource.instance_user
+    group new_resource.instance_group
     action :run
   end
 
@@ -530,19 +537,32 @@ action :install do
     action :create
   end
 
+  session_secret_file = ::File.join(conf_dir, 'session_secret')
+
+  file session_secret_file do
+    content lazy { ::SecureRandom.alphanumeric(32) }
+    owner 'root'
+    group 'root'
+    mode 0600
+    action :create_if_missing
+  end
+
   server_env_file_path = ::File.join(conf_dir, 'server')
   template server_env_file_path do
     cookbook 'volgactf-qualifier'
     source 'server_env.erb'
-    owner instance.root
+    owner 'root'
     group node['root_group']
-    variables(
-      new_resource: new_resource,
-      task_files_basedir: task_files_basedir,
-      upload_tmp_basedir: upload_tmp_basedir,
-      team_logos_basedir: team_logos_basedir,
-      dist_frontend_dir: dist_frontend_dir
-    )
+    variables lazy {
+      {
+        new_resource: new_resource,
+        task_files_basedir: task_files_basedir,
+        upload_tmp_basedir: upload_tmp_basedir,
+        team_logos_basedir: team_logos_basedir,
+        dist_frontend_dir: dist_frontend_dir,
+        session_secret: ::File.read(session_secret_file)
+      }
+    }
     mode 0600
     action :create
     notifies :restart, "systemd_unit[#{new_resource.service_group_name}_server.service]", :delayed
@@ -581,7 +601,7 @@ action :install do
   template queue_env_file_path do
     cookbook 'volgactf-qualifier'
     source 'queue_env.erb'
-    owner instance.root
+    owner 'root'
     group node['root_group']
     variables(
       new_resource: new_resource,
@@ -625,7 +645,7 @@ action :install do
   template scheduler_env_file_path do
     cookbook 'volgactf-qualifier'
     source 'scheduler_env.erb'
-    owner instance.root
+    owner 'root'
     group node['root_group']
     variables(
       new_resource: new_resource
@@ -675,8 +695,8 @@ action :install do
     template cleanup_upload_dir_script do
       cookbook 'volgactf-qualifier'
       source 'cleanup_upload_dir.sh.erb'
-      owner instance.user
-      group instance.group
+      owner new_resource.instance_user
+      group new_resource.instance_group
       variables(
         run_user: new_resource.user,
         upload_dir: upload_tmp_basedir
@@ -751,17 +771,19 @@ action :install do
 
   if new_resource.secure && !new_resource.proxied
     tls_rsa_certificate new_resource.fqdn do
+      vlt_provider new_resource.vlt_provider
+      vlt_format new_resource.vlt_format
       action :deploy
     end
 
-    tls = ::ChefCookbook::TLS.new(node)
+    tls = ::ChefCookbook::TLS.new(node, vlt_provider: new_resource.vlt_provider, vlt_format: new_resource.vlt_format)
 
     ngx_vhost_variables.merge!(
       certificate_entries: [
         tls.rsa_certificate_entry(new_resource.fqdn)
       ],
       hsts_max_age: new_resource.hsts_max_age,
-      oscp_stapling: new_resource.oscp_stapling,
+      ocsp_stapling: new_resource.ocsp_stapling,
       resolvers: new_resource.resolvers,
       resolver_valid: new_resource.resolver_valid,
       resolver_timeout: new_resource.resolver_timeout
@@ -769,6 +791,8 @@ action :install do
 
     if tls.has_ec_certificate?(new_resource.fqdn)
       tls_ec_certificate new_resource.fqdn do
+        vlt_provider new_resource.vlt_provider
+        vlt_format new_resource.vlt_format
         action :deploy
       end
 
@@ -797,27 +821,29 @@ action :install do
   template ::File.join(new_resource.root_dir, 'script', 'cli') do
     cookbook 'volgactf-qualifier'
     source 'cli.sh.erb'
-    owner instance.user
-    group instance.group
-    variables(
-      dist_dir: dist_backend_dir,
-      dist_cache_dir: dist_cache_dir,
-      env: {
-        'VOLGACTF_QUALIFIER_SESSION_SECRET' => new_resource.session_secret,
-        'VOLGACTF_QUALIFIER_FQDN' => new_resource.fqdn,
-        'REDIS_HOST' => new_resource.redis_host,
-        'REDIS_PORT' => new_resource.redis_port,
-        'REDIS_DB' => new_resource.redis_db,
-        'VOLGACTF_QUALIFIER_TEAM_LOGOS_DIR' => team_logos_basedir,
-        'VOLGACTF_QUALIFIER_QUEUE_PREFIX' => new_resource.queue_prefix,
-        'VOLGACTF_QUALIFIER_STREAM_REDIS_CHANNEL' => new_resource.stream_redis_channel,
-        'POSTGRES_HOST' => new_resource.postgres_host,
-        'POSTGRES_PORT' => new_resource.postgres_port,
-        'POSTGRES_DBNAME' => new_resource.postgres_db,
-        'POSTGRES_USERNAME' => new_resource.postgres_user,
-        'POSTGRES_PASSWORD' => new_resource.postgres_password
+    owner new_resource.instance_user
+    group new_resource.instance_group
+    variables lazy {
+      {
+        dist_dir: dist_backend_dir,
+        dist_cache_dir: dist_cache_dir,
+        env: {
+          'VOLGACTF_QUALIFIER_SESSION_SECRET' => ::File.read(session_secret_file),
+          'VOLGACTF_QUALIFIER_FQDN' => new_resource.fqdn,
+          'REDIS_HOST' => new_resource.redis_host,
+          'REDIS_PORT' => new_resource.redis_port,
+          'REDIS_DB' => new_resource.redis_db,
+          'VOLGACTF_QUALIFIER_TEAM_LOGOS_DIR' => team_logos_basedir,
+          'VOLGACTF_QUALIFIER_QUEUE_PREFIX' => new_resource.queue_prefix,
+          'VOLGACTF_QUALIFIER_STREAM_REDIS_CHANNEL' => new_resource.stream_redis_channel,
+          'POSTGRES_HOST' => new_resource.postgres_host,
+          'POSTGRES_PORT' => new_resource.postgres_port,
+          'POSTGRES_DBNAME' => new_resource.postgres_db,
+          'POSTGRES_USERNAME' => new_resource.postgres_user,
+          'POSTGRES_PASSWORD' => new_resource.postgres_password
+        }
       }
-    )
+    }
     mode 0755
     action :create
   end
@@ -827,8 +853,8 @@ action :install do
   template dbreset_script do
     cookbook 'volgactf-qualifier'
     source 'dbreset.sh.erb'
-    owner instance.user
-    group instance.group
+    owner new_resource.instance_user
+    group new_resource.instance_group
     variables(
       run_user: new_resource.user,
       pg_host: new_resource.postgres_host,
@@ -842,7 +868,7 @@ action :install do
   end
 
   if new_resource.backup_enabled
-    execute 'pip install awscli' do
+    execute 'pip3 install awscli' do
       action :run
     end
 
@@ -851,8 +877,8 @@ action :install do
     template backup_script do
       cookbook 'volgactf-qualifier'
       source 'backup.sh.erb'
-      owner instance.user
-      group instance.group
+      owner new_resource.instance_user
+      group new_resource.instance_group
       variables(
         run_user: new_resource.user,
         team_logo_file_dir: team_logos_basedir,
@@ -862,10 +888,10 @@ action :install do
         pg_dbname: new_resource.postgres_db,
         pg_username: new_resource.postgres_user,
         pg_password: new_resource.postgres_password,
-        aws_access_key_id: new_resource.aws_access_key_id,
-        aws_secret_access_key: new_resource.aws_secret_access_key,
-        aws_default_region: new_resource.aws_default_region,
-        aws_s3_bucket: new_resource.aws_s3_bucket
+        aws_access_key_id: new_resource.backup_aws_access_key_id,
+        aws_secret_access_key: new_resource.backup_aws_secret_access_key,
+        aws_default_region: new_resource.backup_aws_default_region,
+        aws_s3_bucket: new_resource.backup_aws_s3_bucket
       )
       mode 0755
       action :create

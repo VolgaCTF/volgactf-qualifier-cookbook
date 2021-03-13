@@ -4,6 +4,7 @@ property :user, String, name_property: true
 property :group, String, required: true
 property :uid, Integer, default: 600
 property :gid, Integer, default: 600
+property :instance_user, String, required: true
 
 default_action :create
 
@@ -21,10 +22,8 @@ action :create do
     action :create
   end
 
-  instance = ::ChefCookbook::Instance::Helper.new(node)
-
   group new_resource.group do
-    members [instance.user]
+    members [new_resource.instance_user]
     append true
     action :modify
   end

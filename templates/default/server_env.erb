@@ -11,7 +11,7 @@ POSTGRES_PASSWORD=<%= @new_resource.postgres_password %>
 GOOGLE_TAG_ID=<%= @new_resource.google_tag_id %>
 
 VOLGACTF_QUALIFIER_NUM_PROCESSES=<%= @new_resource.num_processes_server %>
-VOLGACTF_QUALIFIER_SESSION_SECRET=<%= @new_resource.session_secret %>
+VOLGACTF_QUALIFIER_SESSION_SECRET=<%= @session_secret %>
 VOLGACTF_QUALIFIER_FQDN=<%= @new_resource.fqdn %>
 VOLGACTF_QUALIFIER_SECURE=<%= @new_resource.secure ? 'yes' : 'no' %>
 VOLGACTF_QUALIFIER_HOST=<%= @new_resource.backend_host %>
@@ -30,12 +30,14 @@ VOLGACTF_QUALIFIER_TASK_FILES_DIR=<%= @task_files_basedir %>
 VOLGACTF_QUALIFIER_UPLOAD_TMP_DIR=<%= @upload_tmp_basedir %>
 
 VOLGACTF_QUALIFIER_EMAIL_TRANSPORT=<%= @new_resource.email_transport %>
+VOLGACTF_QUALIFIER_EMAIL_WEBHOOK=<%= @new_resource.email_webhook %>
 VOLGACTF_QUALIFIER_EMAIL_ADDRESS_VALIDATOR=<%= @new_resource.email_address_validator || 'none' %>
 VOLGACTF_QUALIFIER_EMAIL_ADDRESS_VALIDATOR_IGNORE_LIST=<%= @new_resource.email_address_validator_ignore_list.join(',') %>
 
-MAILGUN_API_KEY=<%= @new_resource.mailgun_api_key %>
-MAILGUN_DOMAIN=<%= @new_resource.mailgun_domain %>
+CTFTIME_OAUTH_CLIENT_ID=<%= @new_resource.ctftime_oauth_client_id %>
+CTFTIME_OAUTH_CLIENT_SECRET=<%= @new_resource.ctftime_oauth_client_secret %>
 
-ZEROBOUNCE_API_KEY=<%= @new_resource.zerobounce_api_key %>
-MAILBOXLAYER_API_KEY=<%= @new_resource.mailboxlayer_api_key %>
-THECHECKER_API_KEY=<%= @new_resource.thechecker_api_key %>
+CTFTIME_OAUTH_SCOPE=<%= @new_resource.ctftime_oauth_scope %>
+CTFTIME_OAUTH_AUTHORIZATION_SERVER_ENDPOINT=<%= @new_resource.ctftime_oauth_authorization_server_endpoint %>
+CTFTIME_OAUTH_ACCESS_TOKEN_ENDPOINT=<%= @new_resource.ctftime_oauth_access_token_endpoint %>
+CTFTIME_OAUTH_API_ENDPOINT=<%= @new_resource.ctftime_oauth_api_endpoint %>
