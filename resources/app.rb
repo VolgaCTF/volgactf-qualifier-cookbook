@@ -120,6 +120,7 @@ property :backup_cron_weekday, String, default: '*'
 property :geoip2_city_database, String, required: true
 property :geoip2_country_database, String, required: true
 
+property :listen_ipv6, [TrueClass, FalseClass], default: false
 property :secure, [TrueClass, FalseClass], required: true
 property :proxied, [TrueClass, FalseClass], required: true
 property :hsts_max_age, Integer, default: 15_768_000
@@ -143,6 +144,13 @@ property :ctftime_oauth_scope, String, default: 'profile:read team:read'
 property :ctftime_oauth_authorization_server_endpoint, String, default: 'https://oauth.ctftime.org/authorize'
 property :ctftime_oauth_access_token_endpoint, String, default: 'https://oauth.ctftime.org/token'
 property :ctftime_oauth_api_endpoint, String, default: 'https://oauth.ctftime.org/user'
+
+property :scoring_dynlog_min, Integer, required: true
+property :scoring_dynlog_max, Integer, required: true
+property :scoring_dynlog_k, Float, required: true
+property :scoring_dynlog_v, Float, required: true
+
+property :check_template_mtime, [TrueClass, FalseClass], default: false
 
 default_action :install
 
@@ -753,6 +761,7 @@ action :install do
   end
 
   ngx_vhost_variables = {
+    listen_ipv6: new_resource.listen_ipv6,
     secure: new_resource.secure,
     proxied: new_resource.proxied,
     fqdn: new_resource.fqdn,

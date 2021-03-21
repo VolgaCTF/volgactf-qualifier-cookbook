@@ -5,6 +5,9 @@ upstream volgactf_qualifier_backend {
 <% if @secure && !@proxied %>
 server {
   server_name <%= @fqdn %>;
+  <% if @listen_ipv6 %>
+  listen [::]:80;
+  <% end %>
   listen 80;
 
   location / {
@@ -16,6 +19,9 @@ server {
 server {
   server_name <%= @fqdn %>;
   <% if @secure && !@proxied %>
+  <% if @listen_ipv6 %>
+  listen [::]:443 ssl http2;
+  <% end %>
   listen 443 ssl http2;
 
   <% @certificate_entries.each do |item| %>
@@ -31,6 +37,9 @@ server {
   <% end %>
 
   <% else %>
+  <% if @listen_ipv6 %>
+  listen [::]:80;
+  <% end %>
   listen 80;
   <% end %>
 
@@ -98,11 +107,21 @@ server {
     <% end %>
   }
 
-  location /team/logo {
+  location ~ ^/team/logo/(\d+)/(\w+)$ {
     alias <%= @team_logos_basedir %>;
-    try_files $uri /team/logo/default.png;
-    etag on;
-    add_header Cache-Control must-revalidate;
+    expires 1d;
+    try_files /$1.png /default.png;
+    add_header Cache-Control public;
+    <% if @secure && !@proxied %>
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
+    <% end %>
+  }
+
+  location = /default.png {
+    internal;
+    alias <%= @team_logos_basedir %>/default.png;
+    expires 1d;
+    add_header Cache-Control public;
     <% if @secure && !@proxied %>
     add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %>" always;
     <% end %>

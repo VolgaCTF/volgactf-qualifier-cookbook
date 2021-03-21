@@ -41,3 +41,10 @@ CTFTIME_OAUTH_SCOPE=<%= @new_resource.ctftime_oauth_scope %>
 CTFTIME_OAUTH_AUTHORIZATION_SERVER_ENDPOINT=<%= @new_resource.ctftime_oauth_authorization_server_endpoint %>
 CTFTIME_OAUTH_ACCESS_TOKEN_ENDPOINT=<%= @new_resource.ctftime_oauth_access_token_endpoint %>
 CTFTIME_OAUTH_API_ENDPOINT=<%= @new_resource.ctftime_oauth_api_endpoint %>
+
+VOLGACTF_QUALIFIER_SCORING_DYNLOG_MIN = <%= @new_resource.scoring_dynlog_min %>
+VOLGACTF_QUALIFIER_SCORING_DYNLOG_MAX = <%= @new_resource.scoring_dynlog_max %>
+VOLGACTF_QUALIFIER_SCORING_DYNLOG_K = <%= @new_resource.scoring_dynlog_k %>
+VOLGACTF_QUALIFIER_SCORING_DYNLOG_V = <%= @new_resource.scoring_dynlog_v %>
+
+VOLGACTF_QUALIFIER_CHECK_TEMPLATE_MTIME = <%= @new_resource.check_template_mtime ? 'yes' : 'no' %>
