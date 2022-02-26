@@ -305,6 +305,15 @@ action :install do
     action :create
   end
 
+  node_exec_path = nil
+  ruby_block 'obtain node executable path' do
+    block do
+      node_exec_path = `which node`.strip
+    end
+  end
+
+  node_exec_flags = new_resource.development ? '--trace-deprecation --trace-warnings' : ''
+
   unless new_resource.customizer_name.nil?
     dist_customizer_dir = ::File.join(new_resource.root_dir, 'dist', 'customizer')
 
@@ -340,13 +349,6 @@ action :install do
       action :run
     end
 
-    node_executable_path = nil
-    ruby_block 'obtain node executable path' do
-      block do
-        node_executable_path = `which node`.strip
-      end
-    end
-
     customizer_env_file_path = ::File.join(conf_dir, 'customizer')
     template customizer_env_file_path do
       cookbook 'volgactf-qualifier'
@@ -376,7 +378,7 @@ action :install do
             User: new_resource.user,
             WorkingDirectory: dist_customizer_dir,
             EnvironmentFile: customizer_env_file_path,
-            ExecStart: "#{node_executable_path} #{::File.join(dist_customizer_dir, 'bin', 'server.js')}"
+            ExecStart: "#{node_exec_path} #{node_exec_flags} #{::File.join(dist_customizer_dir, 'bin', 'server.js')}"
           }
         }
       })
@@ -598,7 +600,7 @@ action :install do
           User: new_resource.user,
           WorkingDirectory: dist_backend_dir,
           EnvironmentFile: server_env_file_path,
-          ExecStart: "#{node_executable_path} #{::File.join(dist_backend_dir, 'src', 'bin', 'app.js')}"
+          ExecStart: "#{node_exec_path} #{node_exec_flags} #{::File.join(dist_backend_dir, 'src', 'bin', 'app.js')}"
         }
       }
     })
@@ -642,7 +644,7 @@ action :install do
           User: new_resource.user,
           WorkingDirectory: dist_backend_dir,
           EnvironmentFile: queue_env_file_path,
-          ExecStart: "#{node_executable_path} #{::File.join(dist_backend_dir, 'src', 'bin', 'queue.js')}"
+          ExecStart: "#{node_exec_path} #{node_exec_flags} #{::File.join(dist_backend_dir, 'src', 'bin', 'queue.js')}"
         }
       }
     })
@@ -685,7 +687,7 @@ action :install do
           User: new_resource.user,
           WorkingDirectory: dist_backend_dir,
           EnvironmentFile: scheduler_env_file_path,
-          ExecStart: "#{node_executable_path} #{::File.join(dist_backend_dir, 'src', 'bin', 'scheduler.js')}"
+          ExecStart: "#{node_exec_path} #{node_exec_flags} #{::File.join(dist_backend_dir, 'src', 'bin', 'scheduler.js')}"
         }
       }
     })
@@ -834,6 +836,8 @@ action :install do
     group new_resource.instance_group
     variables lazy {
       {
+        node_exec_path: node_exec_path,
+        node_exec_flags: node_exec_flags,
         dist_dir: dist_backend_dir,
         dist_cache_dir: dist_cache_dir,
         env: {
