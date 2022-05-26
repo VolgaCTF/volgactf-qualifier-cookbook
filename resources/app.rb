@@ -120,7 +120,9 @@ property :backup_cron_weekday, String, default: '*'
 property :geoip2_city_database, String, required: true
 property :geoip2_country_database, String, required: true
 
+property :listen_address, String, default: '*'
 property :listen_ipv6, [TrueClass, FalseClass], default: false
+property :listen_address_ipv6, String, default: '[::]'
 property :secure, [TrueClass, FalseClass], required: true
 property :proxied, [TrueClass, FalseClass], required: true
 property :hsts_max_age, Integer, default: 15_768_000
@@ -763,7 +765,9 @@ action :install do
   end
 
   ngx_vhost_variables = {
+    listen_address: new_resource.listen_address,
     listen_ipv6: new_resource.listen_ipv6,
+    listen_address_ipv6: new_resource.listen_address_ipv6,
     secure: new_resource.secure,
     proxied: new_resource.proxied,
     fqdn: new_resource.fqdn,

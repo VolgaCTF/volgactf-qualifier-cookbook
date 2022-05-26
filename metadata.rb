@@ -1,9 +1,9 @@
 name 'volgactf-qualifier'
-maintainer 'Alexander Pyatkin'
-maintainer_email 'aspyatkin@gmail.com'
+maintainer 'Aleksandr Piatkin'
+maintainer_email 'oss@aptkn.ch'
 license 'MIT'
 description 'Installs and configures VolgaCTF Qualifier platform'
-version '2.2.1'
+version '2.3.0'
 
 depends 'nodejs', '~> 7.0'
 depends 'ngx', '~> 2.2'
